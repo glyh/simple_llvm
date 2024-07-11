@@ -1,0 +1,4 @@
+(executable
+ (public_name simple_llvm)
+ (name main)
+ (libraries simple_llvm_lib))

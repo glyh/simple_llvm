@@ -1,0 +1,8 @@
+(menhir (modules parser))
+(ocamllex (modules lexer))
+
+(library
+ (name simple_llvm_lib)
+ (preprocess (pps ppx_jane))
+ (libraries core)
+ (inline_tests))
