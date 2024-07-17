@@ -28,7 +28,7 @@
    (ppx_jane (>= v0.17.0))
    (core (>= v0.17.1))
    (alcotest :with-test)
-   (ppx_deriving_protobuf (>= 3.0.0)))
+   (llvm (>= 17.0.6)))
    
  (tags
   (topics compiler LLVM)))

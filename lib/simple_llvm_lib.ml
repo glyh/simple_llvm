@@ -28,9 +28,12 @@ let read_stdin () =
   with
     End_of_file -> !acc
 
+let debug (program: typed_program) = 
+    let sexp = sexp_of_typed_program program in
+      sexp |> Sexplib.Sexp.to_string |> print_endline 
+
 let main () = 
     let code_string = read_stdin () in
     let untyped_ast = parse code_string in
     let typed_ast = typecheck untyped_ast in
-    let sexp = sexp_of_typed_program typed_ast in
-      sexp |> Sexplib.Sexp.to_string |> print_endline 
+    debug typed_ast

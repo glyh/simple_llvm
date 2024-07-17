@@ -3,9 +3,7 @@
 
 (library
  (name simple_llvm_lib)
- (flags ; HACK: ppx_deriving_protobuf generates code containing unused rec
-  (:standard -w -39))
  (preprocess 
-   (pps ppx_jane ppx_deriving_protobuf))
+   (pps ppx_jane))
  (libraries core)
  (inline_tests))
