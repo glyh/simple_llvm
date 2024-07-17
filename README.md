@@ -12,7 +12,7 @@ opam switch create . --deps-only --with-test -y
 ```
 - For developing, you may want to have LSP and other stuffs available
 ```sh
-opam install --switch=. -y ocamlformat ocaml-lsp-server
+opam install --switch=. -y ocamlformat ocaml-lsp-server utop
 ```
 - Update the environment, for example if you're on bash: 
 ```bash

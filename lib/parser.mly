@@ -64,10 +64,10 @@ program_eof:
 
 definition: 
   | t=type_param id=IDENTIFIER LPAREN RPAREN body=statement {
-    FuncDef(t, id, [], body) 
+    (t, id, [], body) 
   }
   | t=type_param id=IDENTIFIER LPAREN args=arg_list RPAREN body=statement {
-    FuncDef(t, id, args, body) 
+    (t, id, args, body) 
   }
 
 type_param: 
@@ -82,15 +82,16 @@ arg_list:
   | a=arg COMMA rest=arg_list { [a] @ rest }
 
 arg:
-  | t=type_param id=IDENTIFIER { Arg(t, id) } 
+  | t=type_param id=IDENTIFIER { (t, id) } 
 
 statement: 
   | LBRACE ss=list(statement) RBRACE {
     Block(ss)
   }
   | RETURN e=expression SEMICOL { Return(e) }
+  | ty=type_param id=IDENTIFIER ASSIGN e=expression SEMICOL { Declaration(ty, id, e) }
   | e=expression SEMICOL { Expr(e) }
-  | IF test=expression then_clause=statement ELSE else_clause=statement { If(test, then_clause, else_clause) }
+  | IF LPAREN test=expression RPAREN then_clause=statement ELSE else_clause=statement { If(test, then_clause, else_clause) }
   | FOR LPAREN initial=expression SEMICOL cond=expression SEMICOL step=expression SEMICOL body=statement {
     For(initial, cond, step, body)
   }
@@ -121,6 +122,7 @@ expression:
   | lhs=IDENTIFIER ASSIGN rhs=expression { Assign(lhs, rhs) }
   | id=IDENTIFIER LPAREN RPAREN { Call(id, []) }
   | id=IDENTIFIER LPAREN l=param_list RPAREN { Call(id, l) }
+  | id=IDENTIFIER { Var(id) }
   | lhs=expression op=bin_op rhs=expression { BinOp(op, lhs, rhs) }
   | op=un_op inner=expression { UnOp(op, inner) }
   | LPAREN inner=expression RPAREN { inner }

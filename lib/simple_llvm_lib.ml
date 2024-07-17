@@ -1,6 +1,6 @@
 open Lexing
-open Ast
-(*open Core*)
+open Typecheck
+open Typed_ast
 
 let colnum pos =
   (pos.pos_cnum - pos.pos_bol) - 1
@@ -29,5 +29,8 @@ let read_stdin () =
     End_of_file -> !acc
 
 let main () = 
-  read_stdin () |> parse |> sexp_of_program |> Sexplib.Sexp.to_string |> print_endline
-  (*print_endline "Hello, world!"*)
+    let code_string = read_stdin () in
+    let untyped_ast = parse code_string in
+    let typed_ast = typecheck untyped_ast in
+    let sexp = sexp_of_typed_program typed_ast in
+      sexp |> Sexplib.Sexp.to_string |> print_endline 
