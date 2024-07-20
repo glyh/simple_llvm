@@ -22,3 +22,4 @@ eval $(opam env)
 ```sh
 dune exec simple_llvm
 ```
+Write proper `simple` program and press Ctrl+D to serve a EOF.
