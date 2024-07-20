@@ -79,17 +79,31 @@ let rec cg_codegen_expr (funs: fn_map) (locals: sym_map) (ctx: llcontext) (exp: 
 
   (* Operators for booleans *)
   | TBinOp(
-    (Land | Lor | Eq | NotEq) as bop,
+    (Eq | NotEq | LessThan | LessEq | GreaterThan | GreaterEq | Land | Lor) as bop,
     lhs,
     rhs,
     BoolT
     ) ->
+  let lhs_type = get_expression_type lhs in
   let build_fn = 
-    match bop with
-    | Land -> build_and
-    | Lor -> build_or
-    | Eq -> build_icmp Icmp.Eq
-    | NotEq -> build_icmp Icmp.Ne
+    match (bop, lhs_type) with
+    | (Land, BoolT) -> build_and
+    | (Lor, BoolT) -> build_or
+
+    | (Eq, (IntT | BoolT)) -> build_icmp Icmp.Eq
+    | (Eq, FloatT) -> build_fcmp Fcmp.Oeq
+    | (NotEq, (IntT | BoolT)) -> build_icmp Icmp.Ne
+    | (NotEq, FloatT) -> build_fcmp Fcmp.One
+
+    | (LessThan, IntT) -> build_icmp Icmp.Slt
+    | (LessThan, FloatT) -> build_fcmp Fcmp.Olt
+    | (LessEq, IntT) -> build_icmp Icmp.Sle
+    | (LessEq, FloatT) -> build_fcmp Fcmp.Olt
+    | (GreaterThan, IntT) -> build_icmp Icmp.Sgt
+    | (GreaterThan, FloatT) -> build_fcmp Fcmp.Ogt
+    | (GreaterEq, IntT) -> build_icmp Icmp.Sge
+    | (GreaterEq, FloatT) -> build_fcmp Fcmp.Ogt
+
     | _ -> raise Unreachable
   in
       let lhs_gen = cg_codegen_expr funs locals ctx lhs in
@@ -98,24 +112,12 @@ let rec cg_codegen_expr (funs: fn_map) (locals: sym_map) (ctx: llcontext) (exp: 
 
   (* Operators for numerics *)
   | TBinOp(
-    (Eq | NotEq | LessThan | LessEq | GreaterThan | GreaterEq | Add | Sub | Mul | Div | Mod) as bop, 
+    (Add | Sub | Mul | Div | Mod) as bop, 
     lhs,
     rhs,
     ((IntT | FloatT) as t)) -> 
       let build_fn = 
         match (bop, t) with
-        | (Eq, IntT) -> build_icmp Icmp.Eq
-        | (Eq, FloatT) -> build_fcmp Fcmp.Oeq
-        | (NotEq, IntT) -> build_icmp Icmp.Ne
-        | (NotEq, FloatT) -> build_fcmp Fcmp.One
-        | (LessThan, IntT) -> build_icmp Icmp.Slt
-        | (LessThan, FloatT) -> build_fcmp Fcmp.Olt
-        | (LessEq, IntT) -> build_icmp Icmp.Sle
-        | (LessEq, FloatT) -> build_fcmp Fcmp.Olt
-        | (GreaterThan, IntT) -> build_icmp Icmp.Sgt
-        | (GreaterThan, FloatT) -> build_fcmp Fcmp.Ogt
-        | (GreaterEq, IntT) -> build_icmp Icmp.Sge
-        | (GreaterEq, FloatT) -> build_fcmp Fcmp.Ogt
         | (Add, IntT) -> build_add
         | (Add, FloatT) -> build_fadd
         | (Sub, IntT) -> build_sub
