@@ -260,6 +260,9 @@ let cg_fill_function_definition (funs: fn_map) (ctx: llcontext) (def: typed_defi
   let return_polyfil = undef (cg_to_ll_type ctx ret_ty) in
   build_ret return_polyfil  builder |> ignore
 
+(* NOTE:
+   LLVM IR forbids multiple terminators in a simple block so we have this pass to clean up them.
+*)
 let clean_up_module (m: llmodule) =
   let iter_b (b: llbasicblock) =
     let insts_to_remove: llvalue list ref = ref [] in
