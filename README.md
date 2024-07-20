@@ -2,6 +2,10 @@
 
 A simple C-like language with LLVM as backend.
 
+### Requirements
+- LLVM 17
+- opam
+
 ### Building
 
 - Clone the repo and init the switch
