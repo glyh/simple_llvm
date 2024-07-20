@@ -10,13 +10,7 @@ let pos_string pos =
   and c = string_of_int ((colnum pos) + 1) in
   "line " ^ l ^ ", column " ^ c
 
-let parse s = 
-  let lexbuf = Lexing.from_string s in
-  try 
-    Parser.program_eof Lexer.token lexbuf
-  with 
-    Parser.Error -> 
-      raise (Failure ("Parse error at " ^ (pos_string lexbuf.lex_curr_p)))
+let parse s = Parser_nice.parse_string s
 
 let read_stdin () = 
   let acc = ref "" in 
@@ -33,7 +27,9 @@ let debug (program: typed_program) =
       sexp |> Sexplib.Sexp.to_string |> print_endline 
 
 let main () = 
+    Parser_nice.pp_exceptions ();
     let code_string = read_stdin () in
     let untyped_ast = parse code_string in
     let typed_ast = typecheck untyped_ast in
-    debug typed_ast
+    Codegen.generate_program (Llvm.global_context ()) typed_ast;
+    Codegen.run_program ()

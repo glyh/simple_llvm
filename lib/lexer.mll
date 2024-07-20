@@ -1,14 +1,9 @@
 {
-open Lexing
 open Parser
 
-let advance_line lexbuf =
-  let pos = lexbuf.lex_curr_p in
-  let pos' = { pos with
-    pos_bol = lexbuf.lex_curr_pos;
-    pos_lnum = pos.pos_lnum + 1
-  } in
-  lexbuf.lex_curr_p <- pos'
+exception LexError of string
+
+let[@inline] failwith msg = raise (LexError msg)
 
 let drop_str n s = 
   let len = String.length s in
@@ -34,7 +29,7 @@ let newline = '\r' | '\n' | "\r\n"
 
 (* Rules *)
 
-rule token = parse
+rule next_token = parse
   | int_constant { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | float_constant { F64 (float_of_string (Lexing.lexeme lexbuf)) }
   (* binary operators *)
@@ -80,15 +75,16 @@ rule token = parse
   | identifier { IDENTIFIER (Lexing.lexeme lexbuf) }
   | '"' { read_string (Buffer.create 32) lexbuf }
   (* etc. *)
-  | whitespace { token lexbuf }
-  | newline { token lexbuf } (* just ignore *)
+  | whitespace { next_token lexbuf }
+  | newline { Lexing.new_line lexbuf; next_token lexbuf } (* just ignore *)
   | eof { EOF }
-  | _ { raise (Failure ("Character not allowed in source text: '" ^ Lexing.lexeme lexbuf ^ "'")) }
+  | _ { failwith ("Character not allowed in source text: '" ^ Lexing.lexeme lexbuf ^ "'") }
 
 and read_string buf = parse
+  | newline { Lexing.new_line lexbuf; next_token lexbuf } (* just ignore *)
   | '"' { STRING (Buffer.contents buf) }
   | '\\' '"' { Buffer.add_char buf '"'; read_string buf lexbuf } 
   | '\\' 'n' { Buffer.add_char buf '\n'; read_string buf lexbuf } 
   | [^ '"' '\\']+ { Buffer.add_string buf (Lexing.lexeme lexbuf); read_string buf lexbuf } 
-  | _ { raise (Failure ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
-  | eof { raise (Failure ("String is not terminated")) }
+  | _ { failwith ("Illegal string character: " ^ Lexing.lexeme lexbuf) }
+  | eof { failwith ("String is not terminated") }

@@ -114,8 +114,6 @@ let rec check_expression (sigs: funcsig_map) (locals: local_map) (e: expression)
       let exps_checked = List.map (fun e -> check_expression sigs locals e) exps in
       let type_of_exps = List.map get_expression_type exps_checked in
       let (param_types, ret_type) = StrMap.find id sigs in
-      (*print_endline (dump_type_chain param_types);*)
-      (*print_endline (dump_type_chain type_of_exps);*)
       if (0 == compare type_of_exps param_types)
       then TCall(id, exps_checked, ret_type)
       else raise (CallMismatch(id, param_types, type_of_exps))
@@ -176,5 +174,5 @@ let check_definitons (sigs: funcsig_map) ((ret_ty, name, typed_args, body): defi
 
 let typecheck (p: program) = 
   let function_sigs = collect_function_signatures p in
-  function_sigs |> dump_function_sigs |> print_endline;
+  (*function_sigs |> dump_function_sigs |> print_endline;*)
   p |> List.map (check_definitons function_sigs)

@@ -5,5 +5,12 @@
  (name simple_llvm_lib)
  (preprocess 
    (pps ppx_jane))
- (libraries core)
+ (libraries
+   ctypes-foreign
+   core
+   nice_parser
+   llvm
+   llvm.analysis
+   llvm.executionengine)
+   
  (inline_tests))

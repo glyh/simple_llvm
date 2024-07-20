@@ -3,6 +3,7 @@
 (name simple_llvm)
 
 (using menhir 2.0)
+(using ctypes 0.3)
 
 (generate_opam_files true)
 
@@ -27,6 +28,8 @@
    menhir
    (ppx_jane (>= v0.17.0))
    (core (>= v0.17.1))
+   (nice_parser (>= 1.0.0))
+   (ctypes_foreign (>= 0.22.0))
    (alcotest :with-test)
    (llvm (>= 17.0.6)))
    
