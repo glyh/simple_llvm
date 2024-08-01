@@ -29,7 +29,7 @@
    (ppx_jane (>= v0.17.0))
    (core (>= v0.17.1))
    (nice_parser (>= 1.0.0))
-   (ctypes_foreign (>= 0.22.0))
+   (ctypes-foreign (>= 0.22.0))
    (alcotest :with-test)
    (llvm (>= 17.0.6)))
    

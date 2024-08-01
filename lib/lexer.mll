@@ -57,6 +57,8 @@ rule next_token = parse
   (* preserved words *)
   | "if" { IF }
   | "else" { ELSE }
+  | "when" { WHEN }
+  | "while" { WHILE }
   | "for" { FOR }
   | "return" { RETURN }
 

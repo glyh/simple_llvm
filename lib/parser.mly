@@ -1,6 +1,9 @@
 %{
   open Ast
 
+  let pass = Block([])
+  let pass_exp = Val(Bool(true))
+
 %}
 
 %token EOF
@@ -52,6 +55,8 @@
 
 %token IF
 %token ELSE
+%token WHEN
+%token WHILE
 %token FOR
 %token RETURN
 
@@ -91,7 +96,15 @@ statement:
   | RETURN e=expression SEMICOL { Return(e) }
   | ty=type_param id=IDENTIFIER ASSIGN e=expression SEMICOL { Declaration(ty, id, e) }
   | e=expression SEMICOL { Expr(e) }
-  | IF LPAREN test=expression RPAREN then_clause=statement ELSE else_clause=statement { If(test, then_clause, else_clause) }
+  | IF LPAREN test=expression RPAREN then_clause=statement ELSE else_clause=statement {
+    If(test, then_clause, else_clause) 
+  }
+  | WHEN LPAREN test=expression RPAREN then_clause=statement {
+    If(test, then_clause, pass) 
+  }
+  | WHILE LPAREN cond=expression RPAREN body=statement {
+    For(pass_exp, cond, pass_exp, body) 
+  }
   | FOR LPAREN initial=expression SEMICOL cond=expression SEMICOL step=expression SEMICOL body=statement {
     For(initial, cond, step, body)
   }
