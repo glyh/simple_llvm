@@ -23,6 +23,7 @@ let cg_to_ll_type (ctx: llcontext) (t: type_param): lltype =
   | IntT -> i32_type ctx
   | BoolT -> i1_type ctx
   | FloatT -> float_type ctx
+  | PtrT(_) -> pointer_type ctx
   | StrT -> raise Unimplemented
 
 let cg_generate_value (ctx: llcontext) (v: value): llvalue =

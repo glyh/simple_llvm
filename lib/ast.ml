@@ -9,6 +9,7 @@ type type_param =
   | StrT
   | FloatT
   | BoolT
+  | PtrT of type_param
   [@@deriving sexp]
 
 type value =
@@ -20,6 +21,8 @@ type value =
 
 type unop =
   | Not
+  | Ref
+  | Deref
   [@@deriving sexp]
 
 type identifier = string

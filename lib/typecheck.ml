@@ -5,15 +5,18 @@ exception TypeMismatch of type_param * type_param
 exception BinTypeMismatch of binop * type_param * type_param
 exception CallMismatch of identifier * type_param list * type_param list
 
+exception DerefernencingNonPointer of type_param
+
 type function_type = type_param list * type_param
 
-let type_to_string (t: type_param): string = 
+let rec type_to_string (t: type_param): string = 
     match t with
     | VoidT -> "()"
     | IntT -> "int"
     | StrT -> "string"
     | FloatT -> "float"
     | BoolT -> "bool"
+    | PtrT inner -> "*" ^ type_to_string inner
 
 let dump_type_chain (params_ty: type_param list): string = 
     match params_ty with
@@ -102,6 +105,17 @@ let rec check_expression (sigs: funcsig_map) (locals: local_map) (e: expression)
       if inner_type != BoolT
       then raise (TypeMismatch(BoolT, inner_type))
       else TUnOp(Not, typed_inner, BoolT)
+  | UnOp(Ref, inner) -> 
+      let typed_inner = check_expression sigs locals inner in
+      let inner_type = get_expression_type typed_inner in
+      TUnOp(Ref, typed_inner, PtrT inner_type)
+  | UnOp(Deref, inner) -> 
+      let typed_inner = check_expression sigs locals inner in
+      begin match get_expression_type typed_inner with
+      | PtrT(referenced) ->
+        TUnOp(Deref, typed_inner, referenced)
+      | ty -> raise (DerefernencingNonPointer ty)
+      end
   | Val(Int i) -> 
       TVal(Int i, IntT)
   | Val(Str s) -> 
